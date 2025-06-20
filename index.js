@@ -6,6 +6,7 @@ const cheerio = require('cheerio');
 const fetch = require('node-fetch');
 const fs = require('fs');
 const path = require('path');
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const app = express();
 app.use(express.json());
@@ -595,176 +596,34 @@ ${diagnosis.solutions.map(solution => `<li>${escapeHtml(solution)}</li>`).join('
     return null;
 }
 
-// Chat endpoint
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+
+function looksLikeCode(text) {
+  // Checks for common code patterns in many languages
+  return /(\bdef\b|\bfunction\b|\bclass\b|\{|}|\bvar\b|\blet\b|\bconst\b|;|#include|public |private |=>|print\(|System\.out\.println|<\?php|<html|import )/i.test(text);
+}
+
+// Replace the existing /chat endpoint with Gemini-powered code fixing
 app.post('/chat', async (req, res) => {
+  const { message } = req.body;
+
+  if (typeof message === 'string' && looksLikeCode(message)) {
     try {
-        const { message, isCorrection, originalQuery, context } = req.body;
-        
-        // Handle corrections
-        if (isCorrection && originalQuery) {
-            await learnFromCorrection(originalQuery, message, context);
-            return res.json({ 
-                response: "Thank you for the correction. I've learned from it.",
-                images: [],
-                links: [],
-                videos: []
-            });
-        }
+      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+      const prompt = `Fix any errors in this code and return the corrected version only. Do not explain, just output the fixed code:\n\n${message}`;
 
-        if (!message || typeof message !== 'string') {
-            return res.json({ 
-                response: "What would you like to know?",
-                images: [],
-                links: [],
-                videos: []
-            });
-        }
+      const result = await model.generateContent(prompt);
+      const responseObj = await result.response;
+      const fixedCode = responseObj.text();
 
-        const lowerMessage = message.toLowerCase().trim();
-
-        // Check for self-awareness questions
-        const selfAwarenessResponse = await handleSelfAwarenessQuestion(lowerMessage);
-        if (selfAwarenessResponse) {
-            return res.json(selfAwarenessResponse);
-        }
-
-        // Check for learned responses first
-        const learnedResponse = getLearnedResponse(lowerMessage);
-        if (learnedResponse) {
-            return res.json({
-                response: learnedResponse.response,
-                images: [],
-                links: [{ url: learnedResponse.source, title: 'Source' }],
-                videos: []
-            });
-        }
-
-        // Improve the search query based on learned corrections
-        const improvedQuery = improveSearchQuery(lowerMessage);
-
-        // Check if it's an image request
-        if (isImageRequest(lowerMessage)) {
-            const searchQuery = lowerMessage.replace(/show me|picture of|image of|photo of|show picture|show image|show photo/g, '').trim();
-            const results = await searchWeb(searchQuery + ' images');
-            if (results && results.length > 0) {
-                const formattedResponse = await formatResponse(results, searchQuery);
-                return res.json({ 
-                    response: formattedResponse.text,
-                    images: formattedResponse.images,
-                    links: formattedResponse.links,
-                    videos: formattedResponse.videos
-                });
-            }
-        }
-
-        // Check for YouTube video requests
-        if (lowerMessage.includes('youtube') || lowerMessage.includes('video')) {
-            const searchQuery = lowerMessage.replace(/youtube|video/g, '').trim();
-            const results = await searchWeb(searchQuery + ' site:youtube.com');
-            if (results && results.length > 0) {
-                const formattedResponse = await formatResponse(results, searchQuery);
-                return res.json({ 
-                    response: formattedResponse.text,
-                    images: formattedResponse.images,
-                    links: formattedResponse.links,
-                    videos: formattedResponse.videos
-                });
-            }
-        }
-
-        // Check for basic math
-        if (lowerMessage.includes('times') || lowerMessage.includes('plus') || lowerMessage.includes('minus') || lowerMessage.includes('divided by')) {
-            const result = calculateMath(lowerMessage);
-            if (result !== null) {
-                return res.json({ 
-                    response: `The answer is ${result}.`,
-                    images: [],
-                    links: [],
-                    videos: []
-                });
-            }
-        }
-
-        // Check for basic facts
-        for (const [key, value] of Object.entries(basicFacts)) {
-            if (lowerMessage.includes(key)) {
-                return res.json({ 
-                    response: value,
-                    images: [],
-                    links: [],
-                    videos: []
-                });
-            }
-        }
-
-        // Check for behavioral questions
-        for (const [key, response] of Object.entries(behavioralResponses)) {
-            if (lowerMessage.includes(key)) {
-                return res.json({ 
-                    response,
-                    images: [],
-                    links: [],
-                    videos: []
-                });
-            }
-        }
-
-        // Check for simple responses
-        for (const [key, response] of Object.entries(simpleResponses)) {
-            if (lowerMessage.includes(key)) {
-                return res.json({ 
-                    response,
-                    images: [],
-                    links: [],
-                    videos: []
-                });
-            }
-        }
-
-        // If no simple response, try web search with improved query
-        try {
-            const results = await searchWeb(improvedQuery);
-            if (results && results.length > 0) {
-                const formattedResponse = await formatResponse(results, improvedQuery);
-                
-                // Learn from successful responses
-                if (results[0].snippet) {
-                    learningData.learnedResponses[lowerMessage] = {
-                        response: results[0].snippet,
-                        source: results[0].link,
-                        timestamp: new Date().toISOString()
-                    };
-                    saveLearningData();
-                }
-
-                return res.json({ 
-                    response: formattedResponse.text,
-                    images: formattedResponse.images,
-                    links: formattedResponse.links,
-                    videos: formattedResponse.videos
-                });
-            }
-        } catch (searchError) {
-            console.error('Search error:', searchError.message);
-        }
-
-        // If all else fails, give a clear response
-        return res.json({ 
-            response: "I couldn't find that information. Could you try asking differently?",
-            images: [],
-            links: [],
-            videos: []
-        });
-
-    } catch (error) {
-        console.error('Server error:', error.message);
-        res.json({ 
-            response: "I'm having trouble with the web search. Please try again.",
-            images: [],
-            links: [],
-            videos: []
-        });
+      return res.json({ response: fixedCode });
+    } catch (err) {
+      return res.json({ response: "Sorry, I couldn't process your code right now." });
     }
+  }
+
+  // Fallback for non-code messages
+  res.json({ response: "Please paste your code and I'll try to fix it!" });
 });
 
 // Serve static files
