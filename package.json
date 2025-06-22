@@ -4,7 +4,7 @@
   "description": "A simple coding assistant chatbot with web search",
   "main": "index.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node index.js"
   },
   "dependencies": {
     "express": "^4.18.2",
