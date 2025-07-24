@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Homework Helper</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.2em;
+            margin: 10px 0 0 0;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .feature {
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+
+        .feature-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .feature h3 {
+            color: #667eea;
+            margin: 0 0 10px 0;
+        }
+
+        .feature p {
+            color: #666;
+            margin: 0;
+        }
+
+        .getting-started {
+            background: #f0f7ff;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .getting-started h3 {
+            color: #667eea;
+            margin: 0 0 15px 0;
+        }
+
+        .step {
+            margin: 15px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .step::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .shortcuts {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+
+        .shortcuts h3 {
+            color: #856404;
+            margin: 0 0 15px 0;
+        }
+
+        .shortcut {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .shortcut:last-child {
+            border-bottom: none;
+        }
+
+        .shortcut-key {
+            background: #e9ecef;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            color: #666;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .get-started-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.2s;
+        }
+
+        .get-started-btn:hover {
+            background: #5a6fd8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Homework Helper</h1>
+            <p>Your AI-powered study companion is ready to help!</p>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">📚</div>
+                <h3>Smart Analysis</h3>
+                <p>Analyzes web pages to extract key information and answer your homework questions</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔍</div>
+                <h3>Text Highlighting</h3>
+                <p>Automatically highlights relevant content on pages to help you focus on important information</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <h3>Quick Access</h3>
+                <p>Floating button and keyboard shortcuts for instant homework help anywhere on the web</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🎯</div>
+                <h3>Subject Detection</h3>
+                <p>Automatically detects whether content is math, science, history, or other subjects</p>
+            </div>
+        </div>
+
+        <div class="getting-started">
+            <h3>Getting Started</h3>
+            <div class="step">Navigate to any educational website or page with homework content</div>
+            <div class="step">Click the 🎓 floating button in the bottom-right corner</div>
+            <div class="step">Type your question in the popup window</div>
+            <div class="step">Click "Analyze & Answer" to get help</div>
+            <div class="step">Review the highlighted content and explanations</div>
+        </div>
+
+        <div class="shortcuts">
+            <h3>⌨️ Keyboard Shortcuts</h3>
+            <div class="shortcut">
+                <span>Open Homework Helper</span>
+                <span class="shortcut-key">Ctrl+Shift+H</span>
+            </div>
+            <div class="shortcut">
+                <span>Toggle Selection Mode</span>
+                <span class="shortcut-key">Ctrl+Shift+S</span>
+            </div>
+            <div class="shortcut">
+                <span>Clear Highlights</span>
+                <span class="shortcut-key">Esc</span>
+            </div>
+        </div>
+
+        <div style="text-align: center;">
+            <button class="get-started-btn" onclick="closeWelcome()">Get Started!</button>
+        </div>
+
+        <div class="footer">
+            <p>
+                <strong>Pro Tip:</strong> Right-click on any text to get instant homework help, or use the floating button for full page analysis.
+            </p>
+            <p>
+                For best results, use this extension on educational websites, textbooks, or study materials.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function closeWelcome() {
+            window.close();
+        }
+
+        // Auto-close after 30 seconds if user doesn't interact
+        setTimeout(() => {
+            window.close();
+        }, 30000);
+    </script>
+</body>
+</html>
